@@ -1,7 +1,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets,uic
-from PyQt5.QtWidgets import QApplication, QMainWindow
-
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication, QMainWindow,QMessageBox,QAction,qApp
+import sys,datetime, json
 
 class Ui_FirstWindow(QMainWindow):
     def __init__(self):
@@ -10,8 +11,35 @@ class Ui_FirstWindow(QMainWindow):
         self.result = 0
         self.result_str_all = ""
         self.last_operator = "+"
-        self.startCall()
+        self.history = {}
 
+        self.startCall()
+        self.actionExit.triggered.connect(self.close)
+        self.actionHistory.triggered.connect(self.showHistory)
+        self.actionClean_History.triggered.connect(self.cleanHistory)
+
+        with open('history.json') as outfile:
+            histo = json.load(outfile)
+        print(type(histo))
+
+
+        #self.actionExit.triggered.connect(qApp.quit)
+        #exitAct = QAction(QIcon(''),'&Exit',self)
+        #exitAct.setStatusTip('Exit application')
+        #exitAct.triggered.connect(qApp.quit)
+        #self.menubar.actionExit.addAction(exitAct)
+
+    def showHistory(self):
+        print('show history')
+
+    def cleanHistory(self):
+        print('clean history')
+
+    def close(self):
+        print("exit")
+        with open('history.json','w') as outfile:
+            json.dump(self.history,outfile)
+        qApp.quit()
 
 
     def startCall(self):
@@ -42,6 +70,16 @@ class Ui_FirstWindow(QMainWindow):
         self.result_str_all = self.result_str_all[:-1]
 
     def enterClear(self):
+        date_now = datetime.datetime.now()
+        date_str =date_now.strftime('%Y/%m/%d , %H:%M:%S')
+        new_dic = {'time': date_str,'data':self.result_str_all , 'res':self.result}
+        try:
+            self.history['history'].append(new_dic)
+        except:
+            self.history['history']=[]
+            self.history['history'].append(new_dic)
+
+
         self.result = 0
         self.result_str_all = ""
         self.last_operator = "+"
@@ -49,6 +87,19 @@ class Ui_FirstWindow(QMainWindow):
         self.led_show_all.clear()
         self.dsb_result.setValue(0)
 
+    '''def showdialog():
+       msg = QMessageBox()
+       msg.setIcon(QMessageBox.Information)
+
+       msg.setText("This is a message box")
+       msg.setInformativeText("This is additional information")
+       msg.setWindowTitle("MessageBox demo")
+       msg.setDetailedText("The details are as follows:")
+       msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+       msg.buttonClicked.connect(msgbtn
+
+
+       retval = msg.exec_()'''
 
     def calResult(self):
         if self.led_show.text() == '':
@@ -60,7 +111,11 @@ class Ui_FirstWindow(QMainWindow):
         elif self.last_operator == '-':
             self.result -= input_float
         elif self.last_operator == '/':
-            self.result /= input_float
+            if input_float==0:
+                QMessageBox.about(self ,'Warning...', 'division by zero !')
+                self.enterClear()
+            else:
+                self.result /= input_float
         elif self.last_operator == '*':
             self.result *= input_float
         else:
