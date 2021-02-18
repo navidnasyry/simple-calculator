@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets,uic
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow,QMessageBox,QAction,qApp
 import sys,datetime, json
+from HistoryDialog import HistoryDialog
 
 class Ui_FirstWindow(QMainWindow):
     def __init__(self):
@@ -17,10 +18,17 @@ class Ui_FirstWindow(QMainWindow):
         self.actionExit.triggered.connect(self.close)
         self.actionHistory.triggered.connect(self.showHistory)
         self.actionClean_History.triggered.connect(self.cleanHistory)
+        #self.His_dialog = list()
 
-        with open('history.json') as outfile:
-            histo = json.load(outfile)
-        print(type(histo))
+        try:
+            with open('history.json') as outfile:
+                self.history = json.load(outfile)
+        except:
+            with open('history.json','w') as outfile:
+                self.history = {}
+
+        print(json.dumps(self.history, indent=4))
+        #print(type(histo))
 
 
         #self.actionExit.triggered.connect(qApp.quit)
@@ -31,6 +39,11 @@ class Ui_FirstWindow(QMainWindow):
 
     def showHistory(self):
         print('show history')
+        d = HistoryDialog(self,self.history)
+        #self.His_dialog.append(d)
+        #d.History_txt = self.history
+        d.show()
+
 
     def cleanHistory(self):
         print('clean history')
@@ -62,6 +75,10 @@ class Ui_FirstWindow(QMainWindow):
         self.btn_equal.clicked.connect(self.calResult)
 
 
+    def closeEvent(self, event):
+           self.close()
+           #event.accept()
+
     def enterDel(self):
         if self.led_show.text() == '':
             return
@@ -78,6 +95,7 @@ class Ui_FirstWindow(QMainWindow):
         except:
             self.history['history']=[]
             self.history['history'].append(new_dic)
+        print(json.dumps(self.history, indent=4))
 
 
         self.result = 0
