@@ -9,10 +9,12 @@ class Ui_FirstWindow(QMainWindow):
     def __init__(self):
         super(Ui_FirstWindow,self).__init__()
         uic.loadUi('FirstWindow.ui' , self)
+        self.setWindowTitle('Calculator')
+
         self.result = 0
         self.result_str_all = ""
         self.last_operator = "+"
-        self.history = {}
+        self.history = {'history':[]}
 
         self.startCall()
         self.actionExit.triggered.connect(self.close)
@@ -25,10 +27,10 @@ class Ui_FirstWindow(QMainWindow):
                 self.history = json.load(outfile)
         except:
             with open('history.json','w') as outfile:
-                self.history = {}
+                self.history = {'history':[]}
 
         print(json.dumps(self.history, indent=4))
-        #print(type(histo))
+        print(type(self.history))
 
 
         #self.actionExit.triggered.connect(qApp.quit)
@@ -47,6 +49,10 @@ class Ui_FirstWindow(QMainWindow):
 
     def cleanHistory(self):
         print('clean history')
+        self.history = {'history':[]}
+        with open('history.json','w') as outfile:
+            json.dump(self.history,outfile)
+
 
     def close(self):
         print("exit")

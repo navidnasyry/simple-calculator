@@ -3,16 +3,20 @@ from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow,QMessageBox,QActi
 
 
 class HistoryDialog(QDialog):
-    def __init__(self,his_txt, parent=None):
-        super(HistoryDialog, self).__init__(his_txt)
+    def __init__(self,main_w, parent=None):
+        super(HistoryDialog, self).__init__(main_w)
         uic.loadUi('History.ui' , self)
+        self.setWindowTitle('History')
 
-        self.history_txt = his_txt
-
+        self.history_list = main_w.history['history']
+        print(type(self.history_list))
         self.setText()
 
 
     def setText(self):
-        pass
-        #self.txt_browser_history.setText(self.history_txt)
+        #self.lst_Widget_History.addItem('first\n\nsecond')
+        for i in self.history_list:
+            sub_str = 'time : ' + i['time'] + '\n'+ 'term : '+ i['data'] + '\n' +'result : ' + str(i['res']) + '\n\n'
+            self.lst_Widget_History.addItem(sub_str)
+
 
